@@ -45,6 +45,7 @@ include_directories(
 	include
 )
 add_executable(analyzer.impl src/Analyzer.cpp)
+add_dependencies(analyzer.impl room_analysis_generate_messages_cpp)
 target_link_libraries(analyzer.impl
 	${catkin_LIBRARIES}
 	${ros_base_LIBRARIES}

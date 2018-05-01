@@ -5,11 +5,14 @@
  */
 #include "ros_base/Configuration.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "tf/transform_listener.h"
 
 struct Variables: ros_base::VariablesBase {
     geometry_msgs::PoseStamped marker;
+    uint64_t timestamp;
     bool found;
     int tag_number;
+    tf::TransformListener listener;
     
     Variables() {
         found = false;
@@ -19,6 +22,7 @@ struct Variables: ros_base::VariablesBase {
 
 struct Parameters: ros_base::ParametersBase {
     double velocity;
+    std::string global_frame;
 };
 
 typedef std::shared_ptr < const Parameters > Parameters_ptr;

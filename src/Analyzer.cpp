@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
 bool Analyzer::prepare() {
     Parameters p;
     handle.param<double>("velocity", p.velocity, 0.5);
+    handle.param<std::string>("global_frame", p.global_frame, "map");
     is.initialize(&p);
     pub_velocity_publisher = handle.advertise < geometry_msgs::Twist > ("/cmd_vel", 10);
     timer_velocity_publisher = handle.createTimer(ros::Duration(0.1), &Analyzer::velocity_publisher_callback, this, false, false);
