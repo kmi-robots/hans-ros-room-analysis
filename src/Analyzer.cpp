@@ -51,8 +51,10 @@ int main(int argc, char **argv) {
  */
 bool Analyzer::prepare() {
     Parameters p;
-    handle.param<double>("velocity", p.velocity, 0.5);
+    handle.param<double>("velocity", p.velocity, 0.3);
+    ROS_INFO_STREAM(p.velocity);
     handle.param<std::string>("global_frame", p.global_frame, "map");
+    handle.param<std::string>("url", p.url, "http://137.108.116.193:5000/submitsensing");
     is.initialize(&p);
     pub_velocity_publisher = handle.advertise < geometry_msgs::Twist > ("/cmd_vel", 10);
     timer_velocity_publisher = handle.createTimer(ros::Duration(0.1), &Analyzer::velocity_publisher_callback, this, false, false);
@@ -63,16 +65,17 @@ bool Analyzer::prepare() {
 
 void Analyzer::goalCB() {
     is.vars()->tag_number = action_server.acceptNewGoal()->tag_number;
+    is.vars()->found = false;
     sub_tags_callback = handle.subscribe("/ar_pose_marker", 1, &Analyzer::tags_callback_callback, this);
     timer_velocity_publisher.start();
-    ros::Duration(12.0).sleep();
+    ros::Duration(30.0).sleep();
     timer_velocity_publisher.stop();
     sub_tags_callback.shutdown();
     room_analysis::ExploreResult result_;
     result_.found = is.vars()->found;
     if(is.vars()->found) {
         result_.pose = is.vars()->marker;
-        transmitPosition(is.vars());
+        transmitPosition(is.vars(), is.params());
     }
     action_server.setSucceeded(result_);
 }

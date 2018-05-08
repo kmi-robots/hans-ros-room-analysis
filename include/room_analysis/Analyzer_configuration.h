@@ -8,11 +8,11 @@
 #include "tf/transform_listener.h"
 
 struct Variables: ros_base::VariablesBase {
+    tf::TransformListener listener;
     geometry_msgs::PoseStamped marker;
     uint64_t timestamp;
     bool found;
     int tag_number;
-    tf::TransformListener listener;
     
     Variables() {
         found = false;
@@ -23,6 +23,7 @@ struct Variables: ros_base::VariablesBase {
 struct Parameters: ros_base::ParametersBase {
     double velocity;
     std::string global_frame;
+    std::string url;
 };
 
 typedef std::shared_ptr < const Parameters > Parameters_ptr;
