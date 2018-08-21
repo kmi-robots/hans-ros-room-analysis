@@ -14,20 +14,20 @@ using json = nlohmann::json;
 void detectTags(Variables_ptr v, Parameters_ptr p, const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg) {
     for (auto it = msg->markers.begin(); it != msg->markers.end(); it++) {
         ar_track_alvar_msgs::AlvarMarker marker = *it;
-        if (marker.id == v->tag_number) {
-            ROS_INFO_STREAM("tag found");
+        if (marker.id < v->classes.size()) {
             v->listener.waitForTransform(p->global_frame, marker.header.frame_id, marker.header.stamp, ros::Duration(0.1));
             tf::StampedTransform transform;
             try {
                 marker.pose.header.frame_id = marker.header.frame_id;
                 marker.pose.header.stamp = marker.header.stamp;
-                v->listener.transformPose(p->global_frame, marker.pose, v->marker);
+                v->listener.transformPose(p->global_frame, marker.pose, v->markers[marker.id]);
             } catch (tf::TransformException ex) {
                 ROS_ERROR("%s", ex.what());
                 break;
             }
-            v->timestamp = marker.header.stamp.toNSec();
+            v->timestamps[marker.id] = marker.header.stamp.toNSec();
             v->found = true;
+            ROS_INFO_STREAM("tag found");
         }
     }
 }
@@ -46,25 +46,28 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
 //     header.push_back("Content-Type: application/json");
 //     request.setOpt(new curlpp::options::HttpHeader(header));
     json j;
-    j["detections"] = {{
-        {"behaviour", "checkHeaterFreeArea"},
-        {"category", "object"},
-        {"class", "Heater"},
-        {"pose", {
-            {"position", {
-                {"x", v->marker.pose.position.x},
-                {"y", v->marker.pose.position.y},
-                {"z", v->marker.pose.position.z}}
-            },
-            {"orientation", {
-                {"x", v->marker.pose.orientation.x},
-                {"y", v->marker.pose.orientation.y},
-                {"z", v->marker.pose.orientation.z},
-                {"w", v->marker.pose.orientation.w}}
-            }
-        }},
-        {"timestamp", v->timestamp}
-    }};
+    int i = 0;
+    for(auto it = v->markers.begin(); it != v->markers.end(); it++) {
+        geometry_msgs::PoseStamped mk = *it;
+        j["detections"].push_back({{"behaviour", "checkHeaterFreeArea"},
+                                   {"category", "object"},
+                                   {"class", v->classes[i]},
+                                   {"pose", {
+                                       {"position", {
+                                           {"x", mk.pose.position.x},
+                                           {"y", mk.pose.position.y},
+                                           {"z", mk.pose.position.z}}
+                                       },
+                                       {"orientation", {
+                                           {"x", mk.pose.orientation.x},
+                                           {"y", mk.pose.orientation.y},
+                                           {"z", mk.pose.orientation.z},
+                                           {"w", mk.pose.orientation.w}}
+                                       }
+                                   }},
+                                   {"timestamp", v->timestamps[i]}});
+        i++;
+    }
     std::stringstream ss;
     ss << "json=" << j.dump();
     request.setOpt(new curlpp::options::PostFields(ss.str()));

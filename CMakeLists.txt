@@ -19,7 +19,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(catkin REQUIRED COMPONENTS
 	geometry_msgs
 	roscpp
-	ros_base
+	node_base
 	ar_track_alvar_msgs
 	actionlib_msgs
 )
@@ -41,13 +41,13 @@ catkin_package(
 )
 include_directories(
 	${catkin_INCLUDE_DIRS}
-	${ros_base_INCLUDE_DIRS}
+	${node_base_INCLUDE_DIRS}
 	include
 )
 add_executable(analyzer.impl src/Analyzer.cpp)
 add_dependencies(analyzer.impl room_analysis_generate_messages_cpp)
 target_link_libraries(analyzer.impl
 	${catkin_LIBRARIES}
-	${ros_base_LIBRARIES}
+	${node_base_LIBRARIES}
 	${CURLPP_LDFLAGS}
 )

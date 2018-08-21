@@ -1,9 +1,9 @@
 #goal definition
-int32 tag_number
+string classes
 ---
 #result definition
 bool found
-geometry_msgs/PoseStamped pose
+geometry_msgs/PoseStamped[] pose
 ---
 #feedback
 bool active

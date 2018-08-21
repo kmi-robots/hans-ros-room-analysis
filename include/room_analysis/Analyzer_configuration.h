@@ -3,24 +3,23 @@
 /**
  * Auto-generated Internal State
  */
-#include "ros_base/Configuration.h"
+#include "node_base/Configuration.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "tf/transform_listener.h"
 
-struct Variables: ros_base::VariablesBase {
+struct Variables: node_base::VariablesBase {
     tf::TransformListener listener;
-    geometry_msgs::PoseStamped marker;
-    uint64_t timestamp;
+    std::vector<geometry_msgs::PoseStamped> markers;
+    std::vector<uint64_t> timestamps;
     bool found;
-    int tag_number;
+    std::vector<std::string> classes;
     
     Variables() {
         found = false;
-        tag_number = 0;
     };
 };
 
-struct Parameters: ros_base::ParametersBase {
+struct Parameters: node_base::ParametersBase {
     double velocity;
     std::string global_frame;
     std::string url;
@@ -29,7 +28,7 @@ struct Parameters: ros_base::ParametersBase {
 typedef std::shared_ptr < const Parameters > Parameters_ptr;
 typedef std::shared_ptr < Variables > Variables_ptr;
 
-class InternalState: ros_base::InternalStateBase {
+class InternalState: node_base::InternalStateBase {
     public:
         Variables_ptr vars() {
             return std::static_pointer_cast < Variables > (_vars);
@@ -39,7 +38,7 @@ class InternalState: ros_base::InternalStateBase {
             return std::static_pointer_cast < const Parameters > (_params);
         };
 
-        void initialize(ros_base::ParametersBase *p = NULL) {
+        void initialize(node_base::ParametersBase *p = NULL) {
             _params = std::make_shared < const Parameters > (*static_cast < Parameters * >(p));
             _vars = std::make_shared < Variables > ();
         }
