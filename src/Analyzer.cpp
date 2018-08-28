@@ -54,9 +54,10 @@ bool Analyzer::prepare() {
     handle.param<double>("velocity", p.velocity, 0.3);
     ROS_INFO_STREAM(p.velocity);
     handle.param<std::string>("global_frame", p.global_frame, "map");
+    // POST /submit/sensing?sensing=...
     handle.param<std::string>("url", p.url, "http://137.108.125.184:5000/submitsensing");
     is.initialize(&p);
-    pub_velocity_publisher = handle.advertise < geometry_msgs::Twist > ("/cmd_vel", 10);
+    pub_velocity_publisher = handle.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
     timer_velocity_publisher = handle.createTimer(ros::Duration(0.1), &Analyzer::velocity_publisher_callback, this, false, false);
     action_server.registerGoalCallback(boost::bind(&Analyzer::goalCB, this));
     action_server.start();

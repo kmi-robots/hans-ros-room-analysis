@@ -49,9 +49,10 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
     int i = 0;
     for(auto it = v->markers.begin(); it != v->markers.end(); it++) {
         geometry_msgs::PoseStamped mk = *it;
-        j["detections"].push_back({{"behaviour", "checkHeaterFreeArea"},
-                                   {"category", "object"},
+        j["detections"].push_back({{"shape_type", "point"},
+                                   {"dimensionality", "2d"},
                                    {"class", v->classes[i]},
+                                   {"timestamp", v->timestamps[i]},
                                    {"pose", {
                                        {"position", {
                                            {"x", mk.pose.position.x},
@@ -64,12 +65,13 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
                                            {"z", mk.pose.orientation.z},
                                            {"w", mk.pose.orientation.w}}
                                        }
-                                   }},
-                                   {"timestamp", v->timestamps[i]}});
+                                   }}
+                                   });
         i++;
     }
     std::stringstream ss;
-    ss << "json=" << j.dump();
+    // sensing=
+    ss << "sensing=" << j.dump();
     request.setOpt(new curlpp::options::PostFields(ss.str()));
     ROS_INFO_STREAM("Sending request: " << ss.str());
     request.perform();
