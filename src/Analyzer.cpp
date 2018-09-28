@@ -55,7 +55,7 @@ bool Analyzer::prepare() {
     ROS_INFO_STREAM(p.velocity);
     handle.param<std::string>("global_frame", p.global_frame, "map");
     // POST /submit/sensing?sensing=...
-    handle.param<std::string>("url", p.url, "http://137.108.125.184:5000/submitsensing");
+    handle.param<std::string>("url", p.url, "http://137.108.121.40:7070/submit/sensing");
     is.initialize(&p);
     pub_velocity_publisher = handle.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
     timer_velocity_publisher = handle.createTimer(ros::Duration(0.1), &Analyzer::velocity_publisher_callback, this, false, false);

@@ -49,24 +49,26 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
     int i = 0;
     for(auto it = v->markers.begin(); it != v->markers.end(); it++) {
         geometry_msgs::PoseStamped mk = *it;
-        j["detections"].push_back({{"shape_type", "point"},
-                                   {"dimensionality", "2d"},
-                                   {"class", v->classes[i]},
-                                   {"timestamp", v->timestamps[i]},
-                                   {"pose", {
-                                       {"position", {
-                                           {"x", mk.pose.position.x},
-                                           {"y", mk.pose.position.y},
-                                           {"z", mk.pose.position.z}}
-                                       },
-                                       {"orientation", {
-                                           {"x", mk.pose.orientation.x},
-                                           {"y", mk.pose.orientation.y},
-                                           {"z", mk.pose.orientation.z},
-                                           {"w", mk.pose.orientation.w}}
-                                       }
-                                   }}
-                                   });
+        j["detections"].push_back({{"category", "object"}, //area, connection
+                                   {"class", v->classes[i]}, //Heater
+                                   {"timestamp", v->timestamps[i]}, //millis or nanos?
+                                   {"geometry", {
+                                       {"geometry_class", "point"}, //line, area, volume
+                                        {"pose", {
+                                            {"position", {
+                                                {"x", mk.pose.position.x},
+                                                {"y", mk.pose.position.y},
+                                                {"z", mk.pose.position.z}}
+                                            },
+                                            {"orientation", {
+                                                {"x", mk.pose.orientation.x},
+                                                {"y", mk.pose.orientation.y},
+                                                {"z", mk.pose.orientation.z},
+                                                {"w", mk.pose.orientation.w}}
+                                            }
+                                        }}
+                                   }
+                                   }});
         i++;
     }
     std::stringstream ss;
