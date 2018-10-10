@@ -27,7 +27,6 @@ void detectTags(Variables_ptr v, Parameters_ptr p, const ar_track_alvar_msgs::Al
             }
             v->timestamps[marker.id] = marker.header.stamp.toNSec();
             v->found = true;
-            ROS_INFO_STREAM("tag found");
         }
     }
 }
@@ -42,18 +41,16 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
     ROS_INFO_STREAM("Transmitting...");
     curlpp::Easy request;
     request.setOpt(new curlpp::options::Url(p->url));
-//     std::list<std::string> header;
-//     header.push_back("Content-Type: application/json");
-//     request.setOpt(new curlpp::options::HttpHeader(header));
     json j;
     int i = 0;
+    ROS_INFO_STREAM("size: "<<v->markers.size());
     for(auto it = v->markers.begin(); it != v->markers.end(); it++) {
         geometry_msgs::PoseStamped mk = *it;
         j["detections"].push_back({{"category", "object"}, //area, connection
                                    {"class", v->classes[i]}, //Heater
                                    {"timestamp", v->timestamps[i]}, //millis or nanos?
                                    {"geometry", {
-                                       {"geometry_class", "point"}, //line, area, volume
+                                       {"geom_class", "point"}, //line, area, volume
                                         {"pose", {
                                             {"position", {
                                                 {"x", mk.pose.position.x},
@@ -72,9 +69,12 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
         i++;
     }
     std::stringstream ss;
-    // sensing=
     ss << "sensing=" << j.dump();
     request.setOpt(new curlpp::options::PostFields(ss.str()));
     ROS_INFO_STREAM("Sending request: " << ss.str());
     request.perform();
+    
+    v->markers.clear();
+    v->timestamps.clear();
+    v->classes.clear();
 }

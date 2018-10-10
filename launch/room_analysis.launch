@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="room_analysis" type="analyzer.impl" name="Analyzer" output="screen">
+    <remap from="cmd_vel" to="/mobile_base/commands/velocity"/>
+  </node>
+</launch>
