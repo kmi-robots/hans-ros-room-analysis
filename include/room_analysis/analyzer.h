@@ -42,10 +42,15 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
     curlpp::Easy request;
     request.setOpt(new curlpp::options::Url(p->url));
     json j;
-    int i = 0;
+    int i = -1;
     ROS_INFO_STREAM("size: "<<v->markers.size());
     for(auto it = v->markers.begin(); it != v->markers.end(); it++) {
+        i++;
         geometry_msgs::PoseStamped mk = *it;
+        
+        if(mk.pose.position.x == 0 && mk.pose.position.y == 0 && mk.pose.position.z == 0)
+            continue;
+        
         j["detections"].push_back({{"category", "object"}, //area, connection
                                    {"class", v->classes[i]}, //Heater
                                    {"timestamp", v->timestamps[i]}, //millis or nanos?
@@ -66,7 +71,6 @@ void transmitPosition(Variables_ptr v, Parameters_ptr p) {
                                         }}
                                    }
                                    }});
-        i++;
     }
     std::stringstream ss;
     ss << "sensing=" << j.dump();
